@@ -36,7 +36,7 @@ public class PerformanceTests {
 
     static Logger LOG = Logger.getLogger(PerformanceTests.class.getName());
     Stage stage;
-  //  @Test
+    @Test
     public void insertMany() throws InterruptedException {
         CountDownLatch cdl = new CountDownLatch(1);
         Platform.startup(() ->{
@@ -70,9 +70,10 @@ public class PerformanceTests {
                 long endTime = System.nanoTime();
         long dur = endTime - startTime;
         System.err.println("warmup: total time = " + dur + ", average = " + (dur / WARMUP_CNT));
-
+Thread.sleep(3000);
+        System.err.println("resume");
         startTime = System.nanoTime();
-        final int cnt = 1000;
+        final int cnt = 2000;
         for (int i = 0; i < cnt; i++) {
             char c = (char) ('a' + tlr.nextInt(26));
             if (tlr.nextInt(10) > 8) c = ' ';

@@ -87,7 +87,7 @@ public class UnitBuffer {
      * @return a string with the exportable text content
      */
     public String getText() {
-        LOG.info("gettext");
+//        LOG.info("gettext");
         final StringBuilder sb = new StringBuilder();
         unitList.forEach(unit -> sb.append(unit.getText()));
         return sb.toString();
@@ -120,7 +120,7 @@ public class UnitBuffer {
      * @param unit the unit that is added
      */
     public void append(Unit unit) {
-        LOG.info("Adding "+unit+" with length = "+unit.length()+" to buffer " + this);
+//        LOG.info("Adding "+unit+" with length = "+unit.length()+" to buffer " + this);
         int idx = unitList.size();
         int oldLength = idx == 0 ? 0 : unitLengths[idx-1];
         unitLengths[idx]= oldLength + unit.length();
@@ -147,7 +147,7 @@ public class UnitBuffer {
      * @param position the position within the buffer range
      */
     public void insert(Unit unit, int position) {
-        Thread.dumpStack();
+//        Thread.dumpStack();
         if (unit == null) {
             return;
         }
@@ -225,33 +225,34 @@ public class UnitBuffer {
      * @return the unit that has this range or an empty TextUnit
      */
     public Unit getUnitWithRange(int start, int end) {
-        System.err.println("GUWR, start = "+start+" and end = "+end);
-        if (start < 0) return new TextUnit("");
-        int maccum = 0;
-        for (int i = 0; i < unitList.size(); i++) {
-            System.err.println("UL["+i+"] = "+unitLengths[i]);
-            int prev = i==0 ? 0 : unitLengths[i-1];
-            if ((prev <= start) && (unitLengths[i] >= end)) {
-                System.err.println("plan to return "+unitList.get(i));
-                return unitList.get(i);
-            }
-            
-//            if (unitLengths[i] == start) return unitList.get(i);
-        }
-//        return unitList.get(start);
-//        LOG.info("guwr asked for start = "+start+" and end = "+end+" and unitlist = "+unitList);
-//        int accum = 0;
-//        for (Unit unit : unitList) {
-//            if (unit.isEmpty()) continue;
-//            System.err.println("accum = " + accum+", examine unit "+unit+" with length "+unit.length());
-//            if (accum <= start && end <= accum + unit.length()) {
-//                System.err.println("YES, return "+unit+""
-//                        + "\n");
-////                LOG.info("answer = "+unit+" with text = "+unit.getText()+" and internal text = "+unit.getInternalText());
-//                return unit;
+////        System.err.println("GUWR, start = "+start+" and end = "+end);
+//        if (start < 0) return new TextUnit("");
+//        int maccum = 0;
+//        for (int i = 0; i < unitList.size(); i++) {
+////            System.err.println("UL["+i+"] = "+unitLengths[i]);
+//            int prev = i==0 ? 0 : unitLengths[i-1];
+//            if ((prev <= start) && (unitLengths[i] >= end)) {
+////                System.err.println("plan to return "+unitList.get(i));
+//                return unitList.get(i);
 //            }
-//            accum += unit.length();
+//            
+////            if (unitLengths[i] == start) return unitList.get(i);
 //        }
+//////        return unitList.get(start);
+//////        LOG.info("guwr asked for start = "+start+" and end = "+end+" and unitlist = "+unitList);
+
+
+        int accum = 0; 
+        for (Unit unit : unitList) {
+            if (unit.isEmpty()) continue;
+//            System.err.println("accum = " + accum+", examine unit "+unit+" with length "+unit.length());
+            if (accum <= start && end <= accum + unit.length()) {
+//                System.err.println("YES, return "+unit);
+//                LOG.info("answer = "+unit+" with text = "+unit.getText()+" and internal text = "+unit.getInternalText());
+                return unit;
+            }
+            accum += unit.length();
+        }
         return new TextUnit("");
     }
 

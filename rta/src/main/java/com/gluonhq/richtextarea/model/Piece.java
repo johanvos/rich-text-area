@@ -83,7 +83,7 @@ public final class Piece {
 
     public Unit getUnit() {
         UnitBuffer buffer = BufferType.ORIGINAL == bufferType ? source.originalText : source.additionBuffer;
-        LOG.info("GU for start = "+start+", l = "+length+". buftype = " + bufferType+", buff = "+buffer.getInternalText());
+//        LOG.info("GU for start = "+start+", l = "+length+". buftype = " + bufferType+", buff = "+buffer.getInternalText());
         return length == 0 ? new TextUnit("") : buffer.getUnitWithRange(start, start + length);
     }
 

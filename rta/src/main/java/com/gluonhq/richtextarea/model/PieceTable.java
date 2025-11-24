@@ -125,7 +125,7 @@ public final class PieceTable extends AbstractTextBuffer {
         }
         StringBuilder textSB = new StringBuilder();
         StringBuilder sb = new StringBuilder();
-        LOG.info("START getText, start = "+start+" and end = "+end);
+//        LOG.info("START getText, start = "+start+" and end = "+end);
         walkPieces((p, i, tp) -> {
             Unit unit = p.getUnit();
             sb.append(p.getInternalText());
@@ -137,7 +137,7 @@ public final class PieceTable extends AbstractTextBuffer {
             }
             return (end <= tp);
         });
-        LOG.info("DONE getText, result = "+textSB.toString());
+//        LOG.info("DONE getText, result = "+textSB.toString());
         return textSB.toString();
     }
 
