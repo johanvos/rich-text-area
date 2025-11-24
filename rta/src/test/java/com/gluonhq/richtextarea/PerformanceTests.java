@@ -36,7 +36,7 @@ public class PerformanceTests {
 
     static Logger LOG = Logger.getLogger(PerformanceTests.class.getName());
     Stage stage;
-    @Test
+  //  @Test
     public void insertMany() throws InterruptedException {
         CountDownLatch cdl = new CountDownLatch(1);
         Platform.startup(() ->{

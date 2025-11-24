@@ -44,12 +44,14 @@ import java.util.stream.IntStream;
 
 import static com.gluonhq.richtextarea.model.TextBuffer.ZERO_WIDTH_TABLE_SEPARATOR;
 import static com.gluonhq.richtextarea.model.TextBuffer.ZERO_WIDTH_TEXT;
+import java.util.logging.Logger;
 
 /**
  * Piece table implementation.<br>
  * More info at  https://en.wikipedia.org/wiki/Piece_table
  */
 public final class PieceTable extends AbstractTextBuffer {
+    static Logger LOG = Logger.getLogger(PieceTable.class.getName());
 
     final UnitBuffer originalText;
     UnitBuffer additionBuffer = new UnitBuffer();
@@ -123,6 +125,7 @@ public final class PieceTable extends AbstractTextBuffer {
         }
         StringBuilder textSB = new StringBuilder();
         StringBuilder sb = new StringBuilder();
+        LOG.info("START getText, start = "+start+" and end = "+end);
         walkPieces((p, i, tp) -> {
             Unit unit = p.getUnit();
             sb.append(p.getInternalText());
@@ -134,6 +137,7 @@ public final class PieceTable extends AbstractTextBuffer {
             }
             return (end <= tp);
         });
+        LOG.info("DONE getText, result = "+textSB.toString());
         return textSB.toString();
     }
 

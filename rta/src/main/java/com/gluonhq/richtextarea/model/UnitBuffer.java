@@ -34,6 +34,7 @@ import com.gluonhq.emoji.util.TextUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +52,7 @@ import java.util.regex.Pattern;
  */
 public class UnitBuffer {
 
+    static Logger LOG = Logger.getLogger(UnitBuffer.class.getName());
     /**
      * The block pattern is defined by
      * \ufeff, a @ or a # symbol, any text (any combination of letters, numbers, punctuation and spaces), and a final \ufeff
@@ -64,6 +66,7 @@ public class UnitBuffer {
     private final List<Unit> unitList;
     private volatile boolean dirty = true;
     private String internalText = "";
+    private int[] unitLengths = new int[4096];
 
     public UnitBuffer() {
         this(List.of());
@@ -84,6 +87,7 @@ public class UnitBuffer {
      * @return a string with the exportable text content
      */
     public String getText() {
+        LOG.info("gettext");
         final StringBuilder sb = new StringBuilder();
         unitList.forEach(unit -> sb.append(unit.getText()));
         return sb.toString();
@@ -116,6 +120,10 @@ public class UnitBuffer {
      * @param unit the unit that is added
      */
     public void append(Unit unit) {
+        LOG.info("Adding "+unit+" with length = "+unit.length()+" to buffer " + this);
+        int idx = unitList.size();
+        int oldLength = idx == 0 ? 0 : unitLengths[idx-1];
+        unitLengths[idx]= oldLength + unit.length();
         unitList.add(unit);
         this.dirty = true;
     }
@@ -125,7 +133,9 @@ public class UnitBuffer {
      * @param units a list of units to be added
      */
     public void append(List<Unit> units) {
-        unitList.addAll(units);
+        for (Unit u : units) {
+            append(u);
+        }
         this.dirty = true;
     }
 
@@ -137,6 +147,7 @@ public class UnitBuffer {
      * @param position the position within the buffer range
      */
     public void insert(Unit unit, int position) {
+        Thread.dumpStack();
         if (unit == null) {
             return;
         }
@@ -214,20 +225,39 @@ public class UnitBuffer {
      * @return the unit that has this range or an empty TextUnit
      */
     public Unit getUnitWithRange(int start, int end) {
-        int accum = 0;
-        for (Unit unit : unitList) {
-            if (unit.isEmpty()) continue;
-            if (accum <= start && end <= accum + unit.length()) {
-                return unit;
+        System.err.println("GUWR, start = "+start+" and end = "+end);
+        if (start < 0) return new TextUnit("");
+        int maccum = 0;
+        for (int i = 0; i < unitList.size(); i++) {
+            System.err.println("UL["+i+"] = "+unitLengths[i]);
+            int prev = i==0 ? 0 : unitLengths[i-1];
+            if ((prev <= start) && (unitLengths[i] >= end)) {
+                System.err.println("plan to return "+unitList.get(i));
+                return unitList.get(i);
             }
-            accum += unit.length();
+            
+//            if (unitLengths[i] == start) return unitList.get(i);
         }
+//        return unitList.get(start);
+//        LOG.info("guwr asked for start = "+start+" and end = "+end+" and unitlist = "+unitList);
+//        int accum = 0;
+//        for (Unit unit : unitList) {
+//            if (unit.isEmpty()) continue;
+//            System.err.println("accum = " + accum+", examine unit "+unit+" with length "+unit.length());
+//            if (accum <= start && end <= accum + unit.length()) {
+//                System.err.println("YES, return "+unit+""
+//                        + "\n");
+////                LOG.info("answer = "+unit+" with text = "+unit.getText()+" and internal text = "+unit.getInternalText());
+//                return unit;
+//            }
+//            accum += unit.length();
+//        }
         return new TextUnit("");
     }
 
     @Override
     public String toString() {
-        return "UnitBuffer{" + unitList + "}";
+        return super.toString() + "UnitBuffer{" + unitList + "}";
     }
 
     /**

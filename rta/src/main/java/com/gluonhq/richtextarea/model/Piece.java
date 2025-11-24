@@ -32,8 +32,10 @@ import com.gluonhq.richtextarea.Tools;
 import java.util.Objects;
 
 import static com.gluonhq.richtextarea.Tools.getFirstLetter;
+import java.util.logging.Logger;
 
 public final class Piece {
+    static Logger LOG = Logger.getLogger(Piece.class.getName());
 
     public enum BufferType {ORIGINAL, ADDITION}
 
@@ -81,6 +83,7 @@ public final class Piece {
 
     public Unit getUnit() {
         UnitBuffer buffer = BufferType.ORIGINAL == bufferType ? source.originalText : source.additionBuffer;
+        LOG.info("GU for start = "+start+", l = "+length+". buftype = " + bufferType+", buff = "+buffer.getInternalText());
         return length == 0 ? new TextUnit("") : buffer.getUnitWithRange(start, start + length);
     }
 

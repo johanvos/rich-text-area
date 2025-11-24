@@ -940,6 +940,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
     }
 
     private void keyPressedListener(KeyEvent e) {
+        LOG.info("KPL start");
         long a0 = System.nanoTime();
         // Find an applicable action and execute it if found
         for (KeyCombination kc : INPUT_MAP.keySet()) {
@@ -953,14 +954,15 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
                 return;
             }
         }
-        if (LOG.isLoggable(Level.FINEST)) {
+        if (LOG.isLoggable(Level.INFO)) {
             long a1 = System.nanoTime();
-            LOG.finest("KeyPressed processed in "+ (a1-a0) + "ns");
+            LOG.info("KeyPressed processed in "+ (a1-a0) + "ns");
         }
-
+        LOG.info("KPL done");
     }
 
-    private void keyTypedListener(KeyEvent e) {
+    void keyTypedListener(KeyEvent e) {
+        LOG.info("KTL start");
         long a0 = System.nanoTime();
 
         if (isCharOnly(e)) {
@@ -981,10 +983,11 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
             }
             e.consume();
         }
-        if (LOG.isLoggable(Level.FINEST)) {
+        if (LOG.isLoggable(Level.INFO)) {
             long a1 = System.nanoTime();
-            LOG.finest("KeyTyped processed in "+ (a1-a0) + "ns");
+            LOG.info("KeyTyped processed in "+ (a1-a0) + "ns");
         }
+        LOG.info("KTL done");
     }
 
     private void computeFullHeight() {
