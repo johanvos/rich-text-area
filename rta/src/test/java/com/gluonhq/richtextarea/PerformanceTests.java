@@ -40,13 +40,29 @@ public class PerformanceTests {
         pt.insertMany();
     }
 
-    AtomicInteger ait = new AtomicInteger(0);
-    Runnable prelayout = () -> { 
-        int now = ait.incrementAndGet();
-    };
-
+    /**
+     * This test measures performance of the combination {add character; render UI}
+     * It is important to measure the combination, as a performance enhancements in
+     * one part could lead to a degradation in the other part.
+     * In this test, after a warmup of 1000 characters, we add 1000 characters (to the
+     * already existing 1000 ones). After a character is added, a Pulse is requested.
+     * Ideally, we render at 60 FPS and a character insert takes much less than 16ms,
+     * so that not every requestPulse results in a separate pulse.
+     * We use a prelayoutListener to keep track of how many pulses are executed, and use
+     * that to calculate the FPS.
+     * We also calculate the average time that it takes to add and render a character. This
+     * number needs to be interpreted with caution, as it strongly depends on the performance of the
+     * individual parts, and on the number of additions that can be done within 16ms.
+     *
+     * Note that currently lots of Nodes are created in both parts, and GC activity is expected,
+     * which can influence the measured values.
+     *
+     * Run this test before and after a PR, to check for regression.
+     * @throws InterruptedException
+     */
     public void insertMany() throws InterruptedException {
-
+        AtomicInteger pulseCounter = new AtomicInteger(0);
+        Runnable prelayout = () -> pulseCounter.incrementAndGet();
         final int WARMUP_CNT = 1000; // how many chars to warmup
         final int TEST_CNT = 1000; // how many chars to test
         final int SLEEP_MS = 5000; // sleep between warmup and test
@@ -69,7 +85,6 @@ public class PerformanceTests {
         ThreadLocalRandom tlr = ThreadLocalRandom.current();
         System.err.println("Will test inserts of " + TEST_CNT + " after warmup of " + WARMUP_CNT + " chars, and sleep of " + SLEEP_MS + " ms.");
 
-        long mem0 = getUsedMemory();
         long startTime = System.nanoTime();
         for (int i = 0; i < WARMUP_CNT; i++) {
             char c = (char) ('a' + tlr.nextInt(26));
@@ -98,7 +113,7 @@ public class PerformanceTests {
         System.err.println("warmup: total time = " + dur + ", average = " + (dur / (1e6 * WARMUP_CNT)) + ", now sleep for " + SLEEP_MS);
         Thread.sleep(SLEEP_MS);
         System.err.println("resume");
-        ait.set(0);
+        pulseCounter.set(0);
         Platform.runLater(() -> rta.getScene().addPreLayoutPulseListener(prelayout));
 
         startTime = System.nanoTime();
@@ -118,7 +133,7 @@ public class PerformanceTests {
             });
             boolean await = prodRun.await(1, TimeUnit.SECONDS);
             if (!await) {
-                System.err.println("ERROR warming up");
+                System.err.println("ERROR running test");
                 System.exit(1);
             }
         }
@@ -129,23 +144,9 @@ public class PerformanceTests {
         System.err.println("done 2");
         endTime = System.nanoTime();
         dur = endTime - startTime;
-//        long mem1 = getUsedMemory();
-        long mem1 = 0;
-        System.err.println("FPS = "+1.e9*ait.get()/dur);
-        System.err.println("total time = " + dur + ", average = " + (dur / (1e6 * cnt)) + " and used mem = " + (mem1 - mem0));
+        System.err.println("RefreshRate = "+1.e9*pulseCounter.get()/dur +" FPS");
+        System.err.println("Average duration of a character addition = " + (dur / (1e6 * cnt))+"ms");
         Platform.exit();
-    }
-
-    long getUsedMemory() {
-        System.gc();
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ex) {
-            System.getLogger(PerformanceTests.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        }
-        Runtime runtime = Runtime.getRuntime();
-        long val = runtime.totalMemory() - runtime.freeMemory();
-        return val;
     }
 
 }
