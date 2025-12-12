@@ -91,7 +91,7 @@ class ParagraphTile extends HBox {
     // If table, contentPane has gridBox, an HBox that can be aligned per paragraph text alignment,
     //     and has a grid of cxr layers
 
-    private Paragraph paragraph;
+    Paragraph paragraph;
     private final HBox graphicBox;
     private final Pane contentPane;
 
@@ -122,6 +122,7 @@ class ParagraphTile extends HBox {
     }
 
     void setParagraph(Paragraph paragraph, List<Node> fragments, List<Integer> positions, List<IndexRangeColor> background) {
+//        System.err.println("[PARAGRAPHTILE] set Paragraph to "+paragraph+" with frags = "+fragments+" and pos = "+positions+" and bg = "+background);
         layers.forEach(Layer::reset);
         layers.clear();
         graphicBox.getChildren().clear();
@@ -141,7 +142,7 @@ class ParagraphTile extends HBox {
                 HBox gridBox = createGridBox(fragments, positions, background, decoration);
                 contentPane.getChildren().add(gridBox);
                 contentPane.setPrefWidth(gridBox.getPrefWidth());
-                contentPane.layout();
+                contentPane.requestLayout();
             }
         } else {
             Layer layer = new Layer(paragraph.getStart(), paragraph.getEnd(), false);
@@ -151,7 +152,7 @@ class ParagraphTile extends HBox {
             contentPane.setPrefWidth(layer.getPrefWidth());
             updateGraphicBox(layer, control.getParagraphGraphicFactory());
             graphicBox.setPadding(new Insets(decoration.getTopInset(), 2, decoration.getBottomInset(), 0));
-            contentPane.layout();
+            contentPane.requestLayout();
         }
     }
 

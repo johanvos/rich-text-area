@@ -60,6 +60,7 @@ import javafx.scene.input.DataFormat;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 /**
  * The RichTextArea control is a text input component that allows a user to enter multiple lines of
@@ -77,6 +78,14 @@ import java.util.function.Function;
  *
  */
 public class RichTextArea extends Control {
+
+    Logger LOG = Logger.getLogger(RichTextArea.class.getName());
+    @Override
+    protected void layoutChildren() {
+        LOG.info("start layout");
+        super.layoutChildren();
+        LOG.info("done layout");
+    }
 
     public static final String STYLE_CLASS = "rich-text-area";
     public static final DataFormat RTA_DATA_FORMAT;

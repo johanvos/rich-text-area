@@ -152,6 +152,8 @@ class RichListCell extends ListCell<Paragraph> {
 
     @Override
     protected void updateItem(Paragraph item, boolean empty) {
+//        System.err.println("UPDATE "+this+" with current paragraph = " + (this.paragraphTile == null ? "NULL" : this.paragraphTile.paragraph) +" to "+item+" and empty = "+empty);
+//        Thread.dumpStack();
         super.updateItem(item, empty);
         if (item != null && !empty) {
             var fragments = new ArrayList<Node>();

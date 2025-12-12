@@ -364,7 +364,8 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         @Override
         protected void invalidated() {
             if (paragraphListView != null) {
-                Platform.runLater(paragraphListView::updateLayout);
+                System.err.println("TEXTFLOWPREFWIDTH CHANGED!");
+                Platform.runLater(paragraphListView::requestLayout);
             }
         }
     };
@@ -627,7 +628,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
         void updateLayout() {
             // force updateItem call to recalculate backgroundPath positions
-            virtualFlow.rebuildCells();
+           // virtualFlow.rebuildCells();
         }
 
         void scrollIfNeeded() {
@@ -686,13 +687,14 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         objectsCacheEvictionTimer = new SmartTimer(paragraphListView::evictUnusedObjects, 1000, 60000);
         controlPrefWidthListener = (obs, ov, nv) -> {
             refreshTextFlow();
-            paragraphListView.updateLayout();
+            System.err.println("CONTROLPREFWIDTH CHANGED");
+            paragraphListView.requestLayout();
         };
 
         tableAllowedListener = (obs, ov, nv) -> viewModel.setTableAllowed(nv);
-        skinToneChangeListener = (obs, ov, nv) -> refreshTextFlow();
+        skinToneChangeListener = (obs, ov, nv) -> this.requestLayout();
 
-        focusListener = o -> paragraphListView.updateLayout();
+        focusListener = o -> paragraphListView.requestLayout();
 
         control.documentProperty().addListener((obs, ov, nv) -> {
             if (viewModel.isSaved()) {
@@ -782,7 +784,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         getSkinnable().focusedProperty().addListener(focusListener);
         getSkinnable().addEventHandler(DragEvent.ANY, dndHandler);
         getSkinnable().skinToneProperty().addListener(skinToneChangeListener);
-        refreshTextFlow();
+//        refreshTextFlow();
         requestLayout();
         editableChangeListener(null); // sets up all related listeners
         attachedProperty.set(true);
@@ -955,13 +957,14 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         }
         if (LOG.isLoggable(Level.FINEST)) {
             long a1 = System.nanoTime();
-            LOG.finest("KeyPressed processed in "+ (a1-a0) + "ns");
+            LOG.finest(() -> "KeyPressed processed in "+ (a1-a0) + "ns");
         }
 
     }
 
     // not private for testing
     void keyTypedListener(KeyEvent e) {
+        LOG.info(() -> "Start processing KeyEvent in thread "+Thread.currentThread());
         long a0 = System.nanoTime();
 
         if (isCharOnly(e)) {
@@ -982,9 +985,9 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
             }
             e.consume();
         }
-        if (LOG.isLoggable(Level.FINEST)) {
+        if (LOG.isLoggable(Level.INFO)) {
             long a1 = System.nanoTime();
-            LOG.finest("KeyTyped processed in "+ (a1-a0) + "ns");
+            LOG.info(() -> "KeyTyped processed in "+ (a1-a0) + "ns");
         }
     }
 

@@ -56,7 +56,7 @@ public class CommandManager<T> {
         undoStack.push(cmd);
         redoStack.clear();
         end();
-        LOGGER.log(Level.FINE, "Execute: " + this);
+        LOGGER.log(Level.FINE, () -> "Execute: " + this);
     }
 
     public void undo() {
@@ -65,7 +65,7 @@ public class CommandManager<T> {
             cmd.undo(context);
             redoStack.push(cmd);
             end();
-            LOGGER.log(Level.FINE, "Undo: " + this);
+            LOGGER.log(Level.FINE, () -> "Undo: " + this);
         }
     }
 
@@ -100,6 +100,7 @@ public class CommandManager<T> {
 
     @Override
     public String toString() {
+        Thread.dumpStack();
         return "CommandManager<" + context.getClass().getSimpleName() + ">{\n" +
                 " - undoStack=" + undoStack +
                 "\n - redoStack=" + redoStack +

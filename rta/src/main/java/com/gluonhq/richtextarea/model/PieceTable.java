@@ -53,6 +53,8 @@ public final class PieceTable extends AbstractTextBuffer {
 
     final UnitBuffer originalText;
     final AppendOnlyUnitBuffer additionBuffer = new AppendOnlyUnitBuffer();
+//    final UnitBuffer additionBuffer = new UnitBuffer();
+
 
     final List<Piece> pieces = new ArrayList<>();
     private final CommandManager<PieceTable> commander = new CommandManager<>(this);
