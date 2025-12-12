@@ -364,7 +364,6 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         @Override
         protected void invalidated() {
             if (paragraphListView != null) {
-                System.err.println("TEXTFLOWPREFWIDTH CHANGED!");
                 Platform.runLater(paragraphListView::requestLayout);
             }
         }
@@ -687,7 +686,6 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         objectsCacheEvictionTimer = new SmartTimer(paragraphListView::evictUnusedObjects, 1000, 60000);
         controlPrefWidthListener = (obs, ov, nv) -> {
             refreshTextFlow();
-            System.err.println("CONTROLPREFWIDTH CHANGED");
             paragraphListView.requestLayout();
         };
 
@@ -784,7 +782,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
         getSkinnable().focusedProperty().addListener(focusListener);
         getSkinnable().addEventHandler(DragEvent.ANY, dndHandler);
         getSkinnable().skinToneProperty().addListener(skinToneChangeListener);
-//        refreshTextFlow();
+        refreshTextFlow();
         requestLayout();
         editableChangeListener(null); // sets up all related listeners
         attachedProperty.set(true);
@@ -964,7 +962,7 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
 
     // not private for testing
     void keyTypedListener(KeyEvent e) {
-        LOG.info(() -> "Start processing KeyEvent in thread "+Thread.currentThread());
+        LOG.fine(() -> "Start processing KeyEvent in thread "+Thread.currentThread());
         long a0 = System.nanoTime();
 
         if (isCharOnly(e)) {
@@ -985,9 +983,9 @@ public class RichTextAreaSkin extends SkinBase<RichTextArea> {
             }
             e.consume();
         }
-        if (LOG.isLoggable(Level.INFO)) {
+        if (LOG.isLoggable(Level.FINE)) {
             long a1 = System.nanoTime();
-            LOG.info(() -> "KeyTyped processed in "+ (a1-a0) + "ns");
+            LOG.fine(() -> "KeyTyped processed in "+ (a1-a0) + "ns");
         }
     }
 
